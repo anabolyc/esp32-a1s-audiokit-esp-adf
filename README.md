@@ -1,12 +1,7 @@
 
 # Ai-Thinker AudioKit Board SDK
 
-
-EN | [中文](./README-zh.md)
-
-This framework is based on the second development of the ESPRESSIF audio framework esp-adf and follows the official open source agreement.
-
-- https://github.com/Ai-Thinker-Open/ESP32-A1S-AudioKit
+This framework is based on the second development of the ESPRESSIF audio framework [esp-adf](https://github.com/espressif/esp-adf) and follows the official open source agreement.
 
 ## Overview
 
@@ -122,70 +117,8 @@ Note that it is not recommended to source `export.sh` from the profile script di
 - status: on sale
 - audio chips: ES8388 
 
-**step 1** : alter the gpio connection ，path： ```esp-adf/components/audio_board/lyrat_v4_3/board_pins_config.c```
-
-- sda_io: GPIO_33
-- scl_io: GPIO_32
-- bck_io: GPIO_NUM_27
-
-the code as here:
-
-```
-esp_err_t get_i2c_pins(i2c_port_t port, i2c_config_t *i2c_config)
-{
-    AUDIO_NULL_CHECK(TAG, i2c_config, return ESP_FAIL);
-    if (port == I2C_NUM_0 || port == I2C_NUM_1) {
-        i2c_config->sda_io_num = GPIO_NUM_33;
-        i2c_config->scl_io_num = GPIO_NUM_32;
-    } else {
-        i2c_config->sda_io_num = -1;
-        i2c_config->scl_io_num = -1;
-        ESP_LOGE(TAG, "i2c port %d is not supported", port);
-        return ESP_FAIL;
-    }
-    return ESP_OK;
-}
-
-esp_err_t get_i2s_pins(i2s_port_t port, i2s_pin_config_t *i2s_config)
-{
-    AUDIO_NULL_CHECK(TAG, i2s_config, return ESP_FAIL);
-    if (port == I2S_NUM_0 || port == I2S_NUM_1) {
-        i2s_config->bck_io_num = GPIO_NUM_27;
-        i2s_config->ws_io_num = GPIO_NUM_25;
-        i2s_config->data_out_num = GPIO_NUM_26;
-        i2s_config->data_in_num = GPIO_NUM_35;
-    } else {
-        memset(i2s_config, -1, sizeof(i2s_pin_config_t));
-        ESP_LOGE(TAG, "i2s port %d is not supported", port);
-        return ESP_FAIL;
-    }
-    return ESP_OK;
-}
-```
-
-----------------------
-
-##### For ESP-A1S （ESP32 + AC101 audio chips）
-
-- status：halt production
-- audio chips: AC101
-
-**step 1** :  edit the component file  to add the AI Thinker Board to ESP-ADF :   [components/audio_board/component.mk](https://github.com/espressif/esp-adf/blob/master/components/audio_board/component.mk)  
-
-```
-ifdef CONFIG_ESP_AI_THINKER_V2_2_BOARD
-COMPONENT_ADD_INCLUDEDIRS += ./ai_thinker_audio_kit_v2_2
-COMPONENT_SRCDIRS += ./ai_thinker_audio_kit_v2_2
-endif
-```
-
-**step 2** :  add the AI Thinker Board include files to ESP-ADF , add the code form the file [ai_thinker_audio_kit_v2_2](ESP32_AC101_Driver\ai_thinker_audio_kit_v2_2):
-
-![](static/adde.png)
-
-
-and add the below code to edit the config file  :   [components/audio_board/CMakeLists.txt](https://github.com/espressif/esp-adf/blob/master/components/audio_board/CMakeLists.txt)  
-
+- Copy `ESP32_ES8388_Driver/ai_thinker_audio_kit_v2_2` folder to `$ESP_ADF/components/audio_board` folder.
+- Edit `$ESP_ADF/components/audio_board/CMakeLists.txt` file, append to the bottom
 ```
 if (CONFIG_ESP_AI_THINKER_V2_2_BOARD)
 message(STATUS "Current board name is " CONFIG_ESP_AI_THINKER_V2_2_BOARD)
@@ -195,70 +128,85 @@ set(COMPONENT_SRCS
 ./ai_thinker_audio_kit_v2_2/board_pins_config.c
 )
 endif()
+
+register_component()
 ```
-
-laster , add the below code to edit the default config  :   [components/audio_board/Kconfig.projbuild](https://github.com/espressif/esp-adf/blob/master/components/audio_board/Kconfig.projbuild)  
-
+- Edit `$ESP_ADF/components/audio_board/component.mk` file. Append to the bottom
+```
+ifdef CONFIG_ESP_AI_THINKER_V2_2_BOARD
+COMPONENT_ADD_INCLUDEDIRS += ./ai_thinker_audio_kit_v2_2
+COMPONENT_SRCDIRS += ./ai_thinker_audio_kit_v2_2
+endif
+```
+- Edit `$ESP_ADF/components/audio_board/Kconfig.projbuild` file. Update AUDIO_BOARD config section
 ```
 choice AUDIO_BOARD
     prompt "Audio board"
     default ESP_AI_THINKER_V2_2_BOARD
     help
         Select an audio board to use with the ESP-ADF
-        
-···
-···
-
+config AUDIO_BOARD_CUSTOM
+    bool "Custom audio board"
+config ESP_LYRAT_V4_3_BOARD
+    bool "ESP32-Lyrat V4.3"
+config ESP_LYRAT_V4_2_BOARD
+    bool "ESP32-Lyrat V4.2"
+config ESP_LYRATD_MSC_V2_1_BOARD
+    bool "ESP32-LyraTD-MSC V2.1"
+config ESP_LYRATD_MSC_V2_2_BOARD
+    bool "ESP32-LyraTD-MSC V2.2"
+config ESP_LYRAT_MINI_V1_1_BOARD
+    bool "ESP32-Lyrat-Mini V1.1"
+config ESP32_KORVO_DU1906_BOARD
+    bool "ESP32_KORVO_DU1906"
+config ESP32_S2_KALUGA_1_V1_2_BOARD
+    bool "ESP32-S2-Kaluga-1 v1.2"
+config ESP32_S3_KORVO2_V3_BOARD
+    bool "ESP32-S3-Korvo-2 v3"
+config ESP32_S3_BOX_LITE_BOARD
+    bool "ESP32-S3-BOX-Lite"
+config ESP32_S3_BOX_BOARD
+    bool "ESP32-S3-BOX"
 config ESP_AI_THINKER_V2_2_BOARD
     bool "ESP32-AiThinker-audio V2.2"
+```  
+
+##### For ESP-A1S （ESP32 + AC101 audio chips）
+
+- status：halt production
+- audio chips: AC101
+
+- Copy `ESP32_AC101_Driver/ai_thinker_audio_kit_v2_2` folder to `$ESP_ADF/components/audio_board` folder.
+- Copy `ESP32_AC101_Driver/ac101` fodler to `$ESP_ADF/components/audio_hal/driver/` folder.
+- Edit `/media/dronische/storage/sdk/esp-adf/components/audio_hal/CMakeLists.txt` file. Add `ac101` refs to includes
 ```
-
-**step 3** :   add the AI Thinker Board AC101 driver files to ESP-ADF , add the code form the file [ac101](ESP32_AC101_Driver\ac101):
-
-![](static/ac101_here.png)
-
-and add the below code to edit the default config  :   [components/audio_hal/component.mk](https://github.com/espressif/esp-adf/blob/master/audio_hal/component.mk)  
-
+set(COMPONENT_ADD_INCLUDEDIRS ./include
+                            ./driver/ac101
+                            ./driver/es8388
+```
+```
+set(COMPONENT_SRCS ./audio_hal.c
+                    ./driver/ac101/ac101.c
+                    ./driver/es8388/es8388.c
+```
+- Edit `/media/dronische/storage/sdk/esp-adf/components/audio_hal/component.mk` file. Apped to the end
 ```
 COMPONENT_ADD_INCLUDEDIRS += ./driver/ac101
 COMPONENT_SRCDIRS += ./driver/ac101
 ```
-
-laster , add the below code to edit the CMake file :   [components/audio_hal/CMakeLists.txt](https://github.com/espressif/esp-adf/blob/master/audio_hal/CMakeLists.txt)  
-
-```
- ./driver/es8388
- ./driver/es8388/es8388.c
-```
-
-![](static/add_ac101_cmake files.png)
-
+- Do config changes as described in ES8388 section to `CMakeLists.txt`, `component.mk` and `Kconfig.projbuild` files.
 
 #### Step 6. Start a Project 
 
-#####  For ESP-A1S （ESP32 + ES8388 audio chips）
-
-cd ```examples/player/pipeline_bt_source``` , run ```idf.py menuconfig --- Audio Hal``` , select ```ESP32-Lyrat V4.3```
+cd ```examples/player/pipeline_bt_source``` , run ```idf.py menuconfig --- Audio Hal``` , select ```ESP32-AiThinker-audio V2.2```
 
 <img src="static/menuconfig_8388.png" width="580" align="center"/>
 
 Flash the binaries that you just built onto your board by running :
 
 ```
-idf.py -p PORT [-b BAUD] flash monitor
+idf.py flash monitor
 ```
-
-##### For ESP-A1S （ESP32 + AC101 audio chips）
-
-cd ```examples/player/pipeline_bt_source``` , run ```idf.py menuconfig --- Audio Hal``` , select ```ESP_AI_THINKER_V2_2_BOARD```
-
-Flash the binaries that you just built onto your board by running :
-
-```
-idf.py -p PORT [-b BAUD] flash monitor
-```
-
-##### 
 
 # Resources
 
