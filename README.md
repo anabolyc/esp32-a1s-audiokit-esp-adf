@@ -112,10 +112,7 @@ Note that it is not recommended to source `export.sh` from the profile script di
 
 #### Step 5. Adapter ESP-A1S Module 
 
-##### For ESP-A1S （ESP32 + ES8388 audio chips）
-
-- status: on sale
-- audio chips: ES8388 
+##### For ESP-A1S （ESP32 + ES8388 audio chips, status: on sale）
 
 - Copy `ESP32_ES8388_Driver/ai_thinker_audio_kit_v2_2` folder to `$ESP_ADF/components/audio_board` folder.
 - Edit `$ESP_ADF/components/audio_board/CMakeLists.txt` file, append to the bottom
@@ -171,10 +168,7 @@ config ESP_AI_THINKER_V2_2_BOARD
     bool "ESP32-AiThinker-audio V2.2"
 ```  
 
-##### For ESP-A1S （ESP32 + AC101 audio chips）
-
-- status：halt production
-- audio chips: AC101
+##### For ESP-A1S （ESP32 + AC101 audio chips, status：halt production）
 
 - Copy `ESP32_AC101_Driver/ai_thinker_audio_kit_v2_2` folder to `$ESP_ADF/components/audio_board` folder.
 - Copy `ESP32_AC101_Driver/ac101` fodler to `$ESP_ADF/components/audio_hal/driver/` folder.
@@ -200,7 +194,7 @@ COMPONENT_SRCDIRS += ./driver/ac101
 
 cd ```examples/player/pipeline_bt_source``` , run ```idf.py menuconfig --- Audio Hal``` , select ```ESP32-AiThinker-audio V2.2```
 
-<img src="static/menuconfig_8388.png" width="580" align="center"/>
+![image](https://user-images.githubusercontent.com/5459747/170369886-89256e69-75aa-422f-b108-b3c506fd0688.png)
 
 Flash the binaries that you just built onto your board by running :
 
